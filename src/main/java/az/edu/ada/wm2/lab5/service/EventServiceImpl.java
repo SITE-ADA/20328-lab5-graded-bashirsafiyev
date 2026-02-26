@@ -108,9 +108,28 @@ public List<Event> getUpcomingEvents() {
 }
 
     @Override
-    public List<Event> getEventsByPriceRange(BigDecimal minPrice, BigDecimal maxPrice) {
-       return List.of();
+public List<Event> getEventsByPriceRange(BigDecimal minPrice, BigDecimal maxPrice) {
+
+    if (minPrice == null || maxPrice == null) {
+        throw new IllegalArgumentException("Price range cannot be null");
     }
+
+    if (minPrice.compareTo(BigDecimal.ZERO) < 0 || 
+        maxPrice.compareTo(BigDecimal.ZERO) < 0) {
+        throw new IllegalArgumentException("Price cannot be negative");
+    }
+
+    if (minPrice.compareTo(maxPrice) > 0) {
+        throw new IllegalArgumentException("Min price cannot be greater than max price");
+    }
+
+    return eventRepository.findAll()
+            .stream()
+            .filter(event -> event.getTicketPrice() != null
+                    && event.getTicketPrice().compareTo(minPrice) >= 0
+                    && event.getTicketPrice().compareTo(maxPrice) <= 0)
+            .collect(Collectors.toList());
+}
 
     @Override
     public List<Event> getEventsByDateRange(LocalDateTime start, LocalDateTime end) {
