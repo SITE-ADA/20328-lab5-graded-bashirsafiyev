@@ -96,10 +96,16 @@ public List<Event> getEventsByTag(String tag) {
             .collect(Collectors.toList());
 }
 
-    @Override
-    public List<Event> getUpcomingEvents() {
-        return List.of();
-    }
+@Override
+public List<Event> getUpcomingEvents() {
+    LocalDateTime now = LocalDateTime.now();
+
+    return eventRepository.findAll()
+            .stream()
+            .filter(event -> event.getEventDateTime() != null &&
+                    event.getEventDateTime().isAfter(now))
+            .collect(Collectors.toList());
+}
 
     @Override
     public List<Event> getEventsByPriceRange(BigDecimal minPrice, BigDecimal maxPrice) {
