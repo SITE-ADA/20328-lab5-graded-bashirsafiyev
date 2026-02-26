@@ -151,8 +151,26 @@ public List<Event> getEventsByDateRange(LocalDateTime start, LocalDateTime end) 
 }
 
     @Override
-    public Event updateEventPrice(UUID id, BigDecimal newPrice) {
-        return null;
+public Event updateEventPrice(UUID id, BigDecimal newPrice) {
+
+    if (id == null) {
+        throw new IllegalArgumentException("Event id cannot be null");
     }
+
+    if (newPrice == null) {
+        throw new IllegalArgumentException("New price cannot be null");
+    }
+
+    if (newPrice.compareTo(BigDecimal.ZERO) < 0) {
+        throw new IllegalArgumentException("Price cannot be negative");
+    }
+
+    Event existingEvent = eventRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Event not found with id: " + id));
+
+    existingEvent.setTicketPrice(newPrice);
+
+    return eventRepository.save(existingEvent);
+}
 
 }
