@@ -82,11 +82,19 @@ public class EventServiceImpl implements EventService {
         return eventRepository.save(existingEvent);
     }
 
-    // Custom methods
-    @Override
-    public List<Event> getEventsByTag(String tag) {
-        return List.of();
+@Override
+public List<Event> getEventsByTag(String tag) {
+    if (tag == null || tag.trim().isEmpty()) {
+        throw new IllegalArgumentException("Tag must not be null or empty");
     }
+
+    return eventRepository.findAll()
+            .stream()
+            .filter(event -> event.getTags() != null &&
+                    event.getTags().stream()
+                            .anyMatch(t -> t.equalsIgnoreCase(tag.trim())))
+            .collect(Collectors.toList());
+}
 
     @Override
     public List<Event> getUpcomingEvents() {
